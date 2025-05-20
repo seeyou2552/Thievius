@@ -8,7 +8,7 @@ public class Stat : MonoBehaviour
     public float curValue;
     public float startValue;
     public float maxValue;
-    // public float passiveValue;
+    public float passiveValue;
     public Image uiBar;
 
     void Start()

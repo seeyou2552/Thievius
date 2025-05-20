@@ -179,7 +179,7 @@ public class UIInventory : MonoBehaviour
                         break;
 
                     case ConsumableType.Speed:
-                        // stat.Eat(selectedItem.consumables[i].value);
+                        stat.SpeedBuff(selectedItem.consumables[i].value);
                         break;
                 }
             }

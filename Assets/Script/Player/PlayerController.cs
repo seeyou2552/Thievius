@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     public float jumpPower;
     public int jumpCount;
     public int plusJumpCount;
+    public bool dashing = false;
+    public float dashStamina;
     private Vector2 curMovementInput;
     public LayerMask groundLayerMask;
 
@@ -25,12 +27,24 @@ public class PlayerController : MonoBehaviour
     public Vector2 mouseDelta;
     public bool canLook = true;
 
+    [Header("Ladder Action")]
+    public bool canLadder;
+    public bool laddering;
+    public Ladder ladder;
+
+    [Header("OnPoint Action")]
+    public bool canOnPoint;
+    public bool getOn;
+    public OnPoint onPoint;
+
     public Action inventory;
     private Rigidbody _rigid;
+    public PlayerStat stat;
 
     public void Awake()
     {
         _rigid = GetComponent<Rigidbody>();
+        stat = GetComponent<PlayerStat>();
     }
 
     void Start()
@@ -41,7 +55,6 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Move();
-        if (jumpCount == 2) return;
     }
     private void LateUpdate()
     {
@@ -79,6 +92,16 @@ public class PlayerController : MonoBehaviour
         {
             _rigid.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
             jumpCount--;
+            if (laddering)
+            {
+                ladder.ResetClimbing(gameObject.GetComponent<Rigidbody>());
+                laddering = false;
+            }
+            else if (getOn)
+            {
+                onPoint.ResetGetOn(gameObject.GetComponent<Rigidbody>());
+                getOn = false;
+            }
         }
     }
 
@@ -88,6 +111,33 @@ public class PlayerController : MonoBehaviour
         {
             inventory?.Invoke();
             ToggleCursor();
+        }
+    }
+
+    public void OnDash(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            dashing = true;
+        }
+        else if (context.phase == InputActionPhase.Canceled)
+        {
+            dashing = false;
+        }
+
+    }
+
+    public void OnAction(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Started && canLadder && !laddering)
+        {
+            laddering = true;
+            ladder.LadderAction();
+        }
+        else if (context.phase == InputActionPhase.Started && canOnPoint && !getOn)
+        {
+            getOn = true;
+            onPoint.OnPointAction();
         }
     }
 
@@ -111,11 +161,34 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
-        dir *= moveSpeed;
-        dir.y = _rigid.velocity.y;
+        if (!laddering)
+        {
+            Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
+            if (dashing && stat.CheckStamina())
+            {
+                dir *= (moveSpeed + stat.plusSpeed + 5);
+                stat.UseStamina(dashStamina);
+            }
+            else dir *= (moveSpeed + stat.plusSpeed);
 
-        _rigid.velocity = dir;
+            dir.y = _rigid.velocity.y;
+
+            _rigid.velocity = dir;
+
+        }
+        else if (laddering)
+        {
+            Vector3 dir = transform.up * curMovementInput.y;
+            dir *= moveSpeed;
+
+            _rigid.velocity = dir;
+            
+            if (IsGrounded())
+            {
+                laddering = false;
+                ladder.ResetClimbing(gameObject.GetComponent<Rigidbody>());
+            }
+        }
 
     }
 
@@ -139,5 +212,17 @@ public class PlayerController : MonoBehaviour
 
         }
         return false;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (canLadder && other.CompareTag("Ladder"))
+        {
+            ladder = other.GetComponent<Ladder>();
+        }
+        else if (canOnPoint && other.CompareTag("OnPoint"))
+        {
+            onPoint = other.GetComponent<OnPoint>();
+        }
     }
 }
