@@ -42,7 +42,7 @@ public class OnPoint : MonoBehaviour
                           RigidbodyConstraints.FreezePositionZ;
         rigidPlayer.useGravity = false;
 
-        CharacterManager.Instance.Player.controller.jumpCount = CharacterManager.Instance.Player.controller.plusJumpCount;
+        CharacterManager.Instance.Player.controller.jumpCount = CharacterManager.Instance.Player.controller.plusJumpCount + 1;
     }
 
     public void ResetGetOn(Rigidbody rigidPlayer)

@@ -20,12 +20,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("Look")]
     public Transform cameraContainer;
+    public Transform camera;
     public float minXLook;
     public float maxXLook;
     private float camCurXRot;
     public float lookSensitivity;
     public Vector2 mouseDelta;
     public bool canLook = true;
+    public bool thirdView;
 
     [Header("Ladder Action")]
     public bool canLadder;
@@ -37,9 +39,12 @@ public class PlayerController : MonoBehaviour
     public bool getOn;
     public OnPoint onPoint;
 
+    [Header("Animation")]
+    public Animator animator;
+
     public Action inventory;
     private Rigidbody _rigid;
-    public PlayerStat stat;
+    private PlayerStat stat;
 
     public void Awake()
     {
@@ -70,10 +75,15 @@ public class PlayerController : MonoBehaviour
         if (context.phase == InputActionPhase.Performed)
         {
             curMovementInput = context.ReadValue<Vector2>();
+            animator.SetBool("Idle", false);
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
             curMovementInput = Vector2.zero;
+            animator.SetBool("Idle", true);
+            animator.SetBool("Walk", false);
+            animator.SetBool("Run", false);
+
         }
     }
 
@@ -123,6 +133,7 @@ public class PlayerController : MonoBehaviour
         else if (context.phase == InputActionPhase.Canceled)
         {
             dashing = false;
+            animator.SetBool("Run", false);
         }
 
     }
@@ -138,6 +149,20 @@ public class PlayerController : MonoBehaviour
         {
             getOn = true;
             onPoint.OnPointAction();
+        }
+    }
+
+    public void OnThirdView(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Started && !thirdView)
+        {
+            camera.localPosition = new Vector3(0f, 1.5f, -3f);
+            thirdView = true;
+        }
+        else if (context.phase == InputActionPhase.Started && thirdView)
+        {
+            camera.localPosition = new Vector3(0f, 1.5f, 0f);
+            thirdView = false;
         }
     }
 
@@ -159,6 +184,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
+
     void Move()
     {
         if (!laddering)
@@ -168,13 +194,23 @@ public class PlayerController : MonoBehaviour
             {
                 dir *= (moveSpeed + stat.plusSpeed + 5);
                 stat.UseStamina(dashStamina);
+                animator.SetBool("Run", !animator.GetBool("Idle"));
+
             }
             else dir *= (moveSpeed + stat.plusSpeed);
-
             dir.y = _rigid.velocity.y;
 
-            _rigid.velocity = dir;
+            if (!stat.CheckStamina())
+            {
+                animator.SetBool("Run", false);
+            }
 
+            if (curMovementInput != Vector2.zero)
+            {
+                animator.SetBool("Walk", !animator.GetBool("Run"));
+            }
+
+            _rigid.velocity = dir;
         }
         else if (laddering)
         {
@@ -182,7 +218,7 @@ public class PlayerController : MonoBehaviour
             dir *= moveSpeed;
 
             _rigid.velocity = dir;
-            
+
             if (IsGrounded())
             {
                 laddering = false;
