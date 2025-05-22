@@ -48,7 +48,7 @@ public class MoveBox : MonoBehaviour
         }
     }
 
-    void ObjectMove()
+    void ObjectMove() // 인스팩터에서 설정한 좌표로 이동
     {
         Vector3 location = new Vector3(locationX, locationY, locationZ);
         transform.position = Vector3.MoveTowards(transform.position, location, moveSpeed * Time.deltaTime);
@@ -56,7 +56,7 @@ public class MoveBox : MonoBehaviour
         // player.position = Vector3.MoveTowards(player.position, location, moveSpeed * Time.deltaTime);
     }
 
-    void ReturnMove()
+    void ReturnMove() // 기존에 있었던 좌표로 이동
     {
         transform.position = Vector3.MoveTowards(transform.position, baseLocation, moveSpeed * Time.deltaTime);
     }

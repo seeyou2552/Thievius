@@ -93,8 +93,6 @@ public class NPC : MonoBehaviour
                 agent.isStopped = false;
                 break;
         }
-
-        // animator.speed = agent.speed / walkSpeed;
     }
 
     void PassiveUpdate()

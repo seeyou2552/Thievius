@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void OnAction(InputAction.CallbackContext context)
+    public void OnAction(InputAction.CallbackContext context) // 특정 상황에서 G키 입력시 특수 상호작용
     {
         if (context.phase == InputActionPhase.Started && canLadder && !laddering)
         {
@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnThirdView(InputAction.CallbackContext context)
+    public void OnThirdView(InputAction.CallbackContext context) // 마우스 우클릭 시 3인칭 시점 전환
     {
         if (context.phase == InputActionPhase.Started && !thirdView)
         {
