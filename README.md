@@ -20,6 +20,8 @@
 ## ⚙️ 주요 기능
 
 - Ladder 액션
+![Ladder 액션](git/LadderActtion.gif)
 
 
 - Perch 액션
+![Perch 액션](git/PerchActtion.gif)
