@@ -12,16 +12,20 @@
 | `WASD` | 이동 |
 | `Left Shift` | 대시 |
 | `G` | 액션 상호작용 |
-| `E` | 인벤토리 열기 |
+| `E` | 아이템 획득 |
+| `Tab` | 인벤토리 |
 | `우클릭` | 3인칭 / 1인칭 전환 |
 
 ---
 
 ## ⚙️ 주요 기능
 
+
 - Ladder 액션
+
 ![Ladder 액션](git/LadderActtion.gif)
 
 
 - Perch 액션
+
 ![Perch 액션](git/PerchActtion.gif)
